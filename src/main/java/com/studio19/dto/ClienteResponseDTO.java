@@ -1,0 +1,19 @@
+package com.studio19.dto;
+
+import com.studio19.model.Cliente;
+
+public record ClienteResponseDTO(
+        Long id,
+        String nome,
+        String email) {
+    public static ClienteResponseDTO valueOf(Cliente cliente) {
+        if (cliente == null) {
+            return new ClienteResponseDTO(null, null, null);
+        }
+
+        return new ClienteResponseDTO(
+                cliente.getId(),
+                cliente.getNome(),
+                cliente.getEmail());
+    }
+}
