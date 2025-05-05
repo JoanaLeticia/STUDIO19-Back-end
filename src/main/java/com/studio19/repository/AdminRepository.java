@@ -21,6 +21,9 @@ public class AdminRepository implements PanacheRepository<Admin>{
             e.printStackTrace();
             return null;
         }
-        
+    }
+
+    public Admin findByEmailAndSenha(String email, String senha) {
+        return find("usuario.email = ?1 AND usuario.senha = ?2", email, senha).firstResult();
     }
 }

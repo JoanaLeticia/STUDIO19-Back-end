@@ -7,7 +7,8 @@ public enum StatusPedido {
     PENDENTE(1, "Pendente"),
     APROVADO(2, "Aprovado"),
     RECUSADO(3, "Recusado"),
-    REEMBOLSADO(4, "Reembolsado");
+    REEMBOLSADO(4, "Reembolsado"),
+    CONCLUIDO(5, "Concluído");
     
     private final Integer id;
     private final String label;

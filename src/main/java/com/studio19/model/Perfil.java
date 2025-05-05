@@ -5,8 +5,8 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
 public enum Perfil {
 
-    CLIENTE(1, "Cliente"),
-    ADMIN(2, "Admin");
+    ADMIN(1, "Admin"),
+    CLIENTE(2, "Cliente");
 
     private final Integer id;
     private final String label;

@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.studio19.model.Cliente;
 import com.studio19.model.Pedido;
+import com.studio19.model.StatusPedido;
 
 import io.quarkus.hibernate.orm.panache.PanacheRepository;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -27,4 +28,13 @@ public class PedidoRepository implements PanacheRepository<Pedido> {
                 .firstResultOptional()
                 .orElse(null);
     }
+
+    public List<Pedido> findByClienteIdAndStatus(Long idCliente, StatusPedido status) {
+        return getEntityManager()
+                .createQuery("SELECT p FROM Pedido p WHERE p.cliente.id = :id AND p.status = :status", Pedido.class)
+                .setParameter("id", idCliente)
+                .setParameter("status", status)
+                .getResultList();
+    }
+
 }

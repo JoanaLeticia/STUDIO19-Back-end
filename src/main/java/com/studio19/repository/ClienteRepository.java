@@ -1,6 +1,7 @@
 package com.studio19.repository;
 
 import com.studio19.model.Cliente;
+import com.studio19.resource.ClienteResource;
 
 import io.quarkus.hibernate.orm.panache.PanacheRepository;
 import jakarta.enterprise.context.ApplicationScoped;

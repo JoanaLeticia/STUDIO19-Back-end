@@ -17,4 +17,8 @@ public class CarrinhoRepository implements PanacheRepository<Carrinho> {
     public List<Carrinho> findByCliente(Cliente cliente) {
         return find("cliente = ?1", cliente).list();
     }
+
+    public Carrinho findByClienteId(Long idCliente) {
+        return find("cliente.id", idCliente).firstResult();
+    }
 }
