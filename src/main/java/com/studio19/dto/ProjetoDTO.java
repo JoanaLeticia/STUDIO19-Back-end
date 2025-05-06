@@ -27,7 +27,7 @@ public record ProjetoDTO (
     Long autorId,
 
     @NotEmpty(message = "A lista de tags não pode estar vazia")
-    List<TagDTO> tagsIds,
+    List<TagDTO> tags,
 
     @NotEmpty(message = "É necessário fornecer ao menos uma imagem")
     List<@NotBlank(message = "A URL da imagem não pode estar em branco") String> imagens,

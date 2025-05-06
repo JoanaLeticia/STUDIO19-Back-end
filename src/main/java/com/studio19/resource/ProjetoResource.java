@@ -9,6 +9,7 @@ import com.studio19.dto.ProjetoDTO;
 import com.studio19.dto.ProjetoResponseDTO;
 import com.studio19.form.ProjetoImagemForm;
 import com.studio19.service.ProjetoService;
+import com.studio19.service.ProjetoFileService;
 
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;

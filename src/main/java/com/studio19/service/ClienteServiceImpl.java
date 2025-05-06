@@ -109,6 +109,7 @@ public class ClienteServiceImpl implements ClienteService {
                 .map(e -> ClienteResponseDTO.valueOf(e)).toList();
     }
 
+    @Override
     public UsuarioResponseDTO login(String email, String senha) {
         // Log de entrada no método
         LOG.info("Tentativa de login com email: " + email);

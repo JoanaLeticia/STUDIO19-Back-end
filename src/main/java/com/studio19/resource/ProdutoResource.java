@@ -8,6 +8,8 @@ import com.studio19.application.Result;
 import com.studio19.dto.ProdutoDTO;
 import com.studio19.dto.ProdutoResponseDTO;
 import com.studio19.service.ProdutoService;
+import com.studio19.service.ProdutoFileService;
+import com.studio19.form.ProdutoImagemForm;
 
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
@@ -132,7 +134,7 @@ public class ProdutoResource {
     @PATCH
     @Path("/{id}/image/upload")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-    public Response upload(@PathParam("id") Long id, @MultipartForm ProdutoImageForm form) {
+    public Response upload(@PathParam("id") Long id, @MultipartForm ProdutoImagemForm form) {
         fileService.salvar(id, form.getNomeImagem(), form.getImagem());
         return Response.noContent().build();
     }

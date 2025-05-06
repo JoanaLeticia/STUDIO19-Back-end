@@ -15,7 +15,7 @@ import com.studio19.repository.ProdutoRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
-import jakarta.validation.ValidationException;
+import com.studio19.validation.ValidationException;
 
 @ApplicationScoped
 public class ProdutoFileService implements FileService {
@@ -28,9 +28,6 @@ public class ProdutoFileService implements FileService {
     @Transactional
     public void salvar(Long id, String nomeImagem, byte[] imagem) {
         Produto produto = produtoRepository.findById(id);
-        if (produto == null) {
-            throw new ValidationException("Produto não encontrado.");
-        }
 
         try {
             String nomeArquivo = salvarImagem(nomeImagem, imagem);

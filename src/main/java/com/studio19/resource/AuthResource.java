@@ -2,6 +2,10 @@ package com.studio19.resource;
 
 import com.studio19.dto.AuthUsuarioDTO;
 import com.studio19.dto.UsuarioResponseDTO;
+import com.studio19.service.AdminService;
+import com.studio19.service.ClienteService;
+import com.studio19.service.HashService;
+import com.studio19.service.JwtService;
 
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
@@ -33,11 +37,21 @@ public class AuthResource {
         String hash = hashService.getHashSenha(dto.senha());
 
         UsuarioResponseDTO usuario = null;
-
+        // perfil 1 = administrador
         if (dto.perfil() == 1) {
-            usuario = adminService.login(dto.login(), hash);
-        } else if (dto.perfil() == 2) {
-            
+            usuario = adminService.login(dto.email(), hash);
+        } else if (dto.perfil() == 2) { // cliente
+            usuario = clienteService.login(dto.email(), hash);   
+        } else {
+            return Response.status(Status.NOT_FOUND).build();
         }
+
+        if (usuario == null) {
+            return Response.status(Status.UNAUTHORIZED).build();
+        }
+
+        return Response.ok(usuario)
+            .header("Authorization", jwtService.generateJwt(usuario))
+            .build();
     }
 }

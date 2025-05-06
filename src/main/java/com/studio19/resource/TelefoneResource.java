@@ -5,6 +5,7 @@ import org.jboss.logging.Logger;
 import com.studio19.application.Result;
 import com.studio19.dto.TelefoneDTO;
 import com.studio19.dto.TelefoneResponseDTO;
+import com.studio19.service.TelefoneService;
 
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
@@ -91,7 +92,7 @@ public class TelefoneResource {
     @RolesAllowed({"Admin"})
     public Response findAll() {
         LOG.info("Buscando todos os Telefone.");
-        return Response.ok(service.findAll()).build();
+        return Response.ok(service.findByAll()).build();
     }
 
     @GET

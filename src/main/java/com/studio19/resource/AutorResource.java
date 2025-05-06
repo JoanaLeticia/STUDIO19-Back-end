@@ -92,7 +92,7 @@ public class AutorResource {
     @RolesAllowed({"Admin"})
     public Response findAll() {
         LOG.info("Buscando todos os autores.");
-        return Response.ok(service.findAll()).build();
+        return Response.ok(service.findByAll()).build();
     }
 
     @GET

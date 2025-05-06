@@ -92,7 +92,7 @@ public class TagResource {
     @RolesAllowed({"Admin"})
     public Response findAll() {
         LOG.info("Buscando todas as tags.");
-        return Response.ok(service.findAll()).build();
+        return Response.ok(service.findByAll()).build();
     }
 
     @GET

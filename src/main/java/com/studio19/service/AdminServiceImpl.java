@@ -1,13 +1,12 @@
 package com.studio19.service;
 
 import java.util.List;
-import java.util.logging.Logger;
+import org.jboss.logging.Logger;
 
 import com.studio19.dto.AdminDTO;
 import com.studio19.dto.AdminResponseDTO;
 import com.studio19.dto.UsuarioResponseDTO;
 import com.studio19.model.Admin;
-import com.studio19.model.Perfil;
 import com.studio19.repository.AdminRepository;
 import com.studio19.repository.UsuarioRepository;
 import com.studio19.resource.AdminResource;
@@ -93,9 +92,20 @@ public class AdminServiceImpl implements AdminService {
             .toList();
     }
 
+    @Override
     public UsuarioResponseDTO login(String email, String senha) {
-        LOG.info("Tentativa de login com e-mail" + email);
-
-        Admin admin = repository.findByEmailAndSenha(email, senha);
+        LOG.info("Tentativa de login com email: " + email);
+        
+        Admin adm = repository.findByEmailAndSenha(email, senha);
+    
+        if (adm == null) {
+            LOG.info("Administrador não encontrado para o email: " + email + " e senha fornecida");
+            throw new RuntimeException("Administrador não encontrado");
+        }
+    
+        // Log de sucesso
+        LOG.info("Login bem-sucedido para o administrador com email: " + email);
+    
+        return UsuarioResponseDTO.valueOf(adm);
     }
 }

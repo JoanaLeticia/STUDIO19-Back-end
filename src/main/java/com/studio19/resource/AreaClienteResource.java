@@ -11,6 +11,7 @@ import com.studio19.dto.PedidoResponseDTO;
 import com.studio19.model.Cliente;
 import com.studio19.repository.ClienteRepository;
 import com.studio19.service.AreaClienteService;
+import com.studio19.service.PedidoService;
 
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;

@@ -151,7 +151,7 @@ public class CarrinhoServiceImpl implements CarrinhoService {
             }
         }
 
-        carrinho.setPrecoTotal(total.floatValue()); // assumindo que precoTotal é float
+        carrinho.setPrecoTotal(total.floatValue());
         return total.floatValue();
     }
 
