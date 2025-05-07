@@ -1,13 +1,13 @@
 package com.studio19.resource;
 
-import java.util.List;
-
 import org.eclipse.microprofile.jwt.JsonWebToken;
 import org.jboss.logging.Logger;
 
-import com.studio19.model.Cliente;
 import com.studio19.repository.ClienteRepository;
 import com.studio19.repository.UsuarioRepository;
+import com.studio19.service.ClienteService;
+import com.studio19.service.PedidoService;
+import com.studio19.service.UsuarioService;
 
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
