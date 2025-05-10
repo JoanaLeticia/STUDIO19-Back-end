@@ -3,12 +3,15 @@ package com.studio19.model;
 import java.util.List;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
 
 @Entity
 public class Autor extends DefaultEntity {
     private String nome;
+    
+    @Column(name = "email_profissional")
     private String emailProfissional;
     private String descricao;
 

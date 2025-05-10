@@ -50,6 +50,7 @@ public class CarrinhoServiceImpl implements CarrinhoService {
     }
 
     @Override
+    @Transactional
     public CarrinhoResponseDTO findByClienteId(Long idCliente) {
         Carrinho carrinho = carrinhoRepository.findByClienteId(idCliente);
         if (carrinho == null) {

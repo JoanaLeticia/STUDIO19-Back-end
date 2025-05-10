@@ -3,6 +3,7 @@ package com.studio19.model;
 import java.util.List;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -20,7 +21,10 @@ public class Pedido extends DefaultEntity {
     @Enumerated(EnumType.STRING)
     private StatusPedido status;
 
+    @Column(name = "valor_total")
     private Double valorTotal;
+
+    @Column(name = "link_projeto")
     private String linkProjeto;
 
     @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL, orphanRemoval = true)

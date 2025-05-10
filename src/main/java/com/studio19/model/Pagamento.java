@@ -2,6 +2,7 @@ package com.studio19.model;
 
 import java.time.LocalDateTime;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -20,8 +21,13 @@ public class Pagamento extends DefaultEntity {
     @Enumerated(EnumType.STRING)
     private StatusPagamento statusPagamento;
 
+    @Column(name = "data_pagamento")
     private LocalDateTime dataPagamento;
+
+    @Column(name = "id_transacao")
     private String idTransacao;
+
+    @Column(name = "valor_pago")
     private Double valorPago;
 
     public Pedido getPedido() {

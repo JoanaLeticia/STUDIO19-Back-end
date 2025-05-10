@@ -6,10 +6,10 @@ import jakarta.inject.Inject;
 
 import org.junit.jupiter.api.Test;
 
-import com.studio19.dto.AdminDTO;
-import com.studio19.dto.AdminResponseDTO;
+import com.studio19.dto.AdministradorDTO;
+import com.studio19.dto.AdministradorResponseDTO;
 import com.studio19.dto.LoginDTO;
-import com.studio19.service.AdminService;
+import com.studio19.service.AdministradorService;
 
 import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,7 +23,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 @QuarkusTest
 public class AdminResourceTest {
     @Inject
-    AdminService adminService;
+    AdministradorService adminService;
 
     private String token;
 
@@ -53,10 +53,7 @@ public class AdminResourceTest {
 
     @Test
     public void testInsert() {
-        AdminDTO adminDTO = new AdminDTO(
-            "Joana Letícia",
-            "joanaleticia@unitins.br",
-            "123");
+        AdministradorDTO adminDTO = new AdministradorDTO("Joana Letícia", "admin@email.com", "123", "123.456.789-00", null);
 
         given()
         .header("Authorization", "Bearer" + token)
@@ -72,18 +69,12 @@ public class AdminResourceTest {
 
     @Test
     public void testUpdate() {
-        AdminDTO dto = new AdminDTO(
-            "Joana Letícia",
-            "joanaleticia@unitins.br",
-            "123");
+        AdministradorDTO dto = new AdministradorDTO("Joana Letícia", "admin@email.com", "123", "123.456.789-00", null);
 
-        AdminResponseDTO usuarioTest = adminService.insert(dto);
+        AdministradorResponseDTO usuarioTest = adminService.create(dto);
         Long id = usuarioTest.id();
 
-        AdminDTO dtoUpdate = new AdminDTO(
-            "Joana Letícia",
-            "leticia@unitins.brb",
-            "123");
+        AdministradorDTO dtoUpdate = new AdministradorDTO("Joaninha Letícia", "admin1@email.com", "123", "123.456.789-00", null);
 
         given()
         .header("Authorization", "Bearer" + token)
@@ -93,18 +84,15 @@ public class AdminResourceTest {
             .then()
             .statusCode(204);
 
-        AdminResponseDTO usu = adminService.findById(id);
+        AdministradorResponseDTO usu = adminService.findById(id);
         assertThat(usu.nome(), is("Joana Letícia"));
     }
 
     @Test
     public void testRemoveAdmin() {
-        AdminDTO dto = new AdminDTO(
-                "Joana Letícia",
-                "joanaleticia@unitins.br",
-                "123");
+        AdministradorDTO dto = new AdministradorDTO("Joana Letícia", "admin@email.com", "123", "123.456.789-00", null);
 
-        AdminResponseDTO adminInserido = adminService.insert(dto);
+        AdministradorResponseDTO adminInserido = adminService.create(dto);
         Long idAdmin = adminInserido.id();
 
         given()
@@ -124,12 +112,9 @@ public class AdminResourceTest {
 
     @Test
     public void testFindById() {
-        AdminDTO dto = new AdminDTO(
-                "Joana Letícia",
-                "joanaleticia@unitins.br",
-                "123");
+        AdministradorDTO dto = new AdministradorDTO("Joana Letícia", "admin@email.com", "123", "123.456.789-00", null);
 
-        AdminResponseDTO usuarioTest = adminService.insert(dto);
+        AdministradorResponseDTO usuarioTest = adminService.create(dto);
         Long id = usuarioTest.id();
 
         given()

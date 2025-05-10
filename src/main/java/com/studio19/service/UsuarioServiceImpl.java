@@ -1,53 +1,38 @@
 package com.studio19.service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import com.studio19.dto.UsuarioDTO;
 import com.studio19.dto.UsuarioResponseDTO;
+import com.studio19.model.Perfil;
 import com.studio19.model.Usuario;
-import com.studio19.repository.AdminRepository;
-import com.studio19.repository.ClienteRepository;
-import com.studio19.repository.PedidoRepository;
-import com.studio19.repository.TelefoneRepository;
 import com.studio19.repository.UsuarioRepository;
-import com.studio19.validation.ValidationException;
-
+import io.quarkus.hibernate.orm.panache.PanacheQuery;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
-import jakarta.validation.Valid;
 
 @ApplicationScoped
 public class UsuarioServiceImpl implements UsuarioService {
-    @Inject
-    UsuarioRepository repository;
 
     @Inject
-    PedidoRepository pedidoRepository;
-
-    @Inject
-    AdminRepository administradorRepository;
-
-    @Inject
-    ClienteRepository clienteRepository;
-
-    @Inject
-    TelefoneRepository telefoneRepository;
+    UsuarioRepository usuarioRepository;
 
     @Override
     @Transactional
-    public UsuarioResponseDTO insert(@Valid UsuarioDTO dto) {
-
-        if (repository.findByEmail(dto.email()) != null) {
-            throw new ValidationException("email", "Email já existe.");
-        }
-
+    public UsuarioResponseDTO create(UsuarioDTO usuario) {
         Usuario novoUsuario = new Usuario();
-        novoUsuario.setEmail(dto.email());
-        novoUsuario.setSenha(dto.senha());
-        novoUsuario.setPerfil(dto.idPerfil());
+        novoUsuario.setNome(usuario.nome());
+        novoUsuario.setEmail(usuario.email());
+        novoUsuario.setSenha(usuario.senha());
 
-        repository.persist(novoUsuario);
+        Perfil perfil = Perfil.valueOf((int) usuario.idPerfil());
+        novoUsuario.setPerfil(perfil);
+
+        usuarioRepository.persist(novoUsuario);
 
         return UsuarioResponseDTO.valueOf(novoUsuario);
     }
@@ -55,74 +40,137 @@ public class UsuarioServiceImpl implements UsuarioService {
     @Override
     @Transactional
     public UsuarioResponseDTO update(UsuarioDTO dto, Long id) {
+        Usuario usuarioEditado = usuarioRepository.findById(id);
 
-        Usuario attUsuario = new Usuario();
-        attUsuario.setEmail(dto.email());
-        attUsuario.setSenha(dto.senha());
-        attUsuario.setPerfil(dto.idPerfil());
+        usuarioEditado.setNome(dto.nome());
+        usuarioEditado.setEmail(dto.email());
+        usuarioEditado.setSenha(dto.senha());
+        Perfil perfil = Perfil.valueOf((int) dto.idPerfil());
+        usuarioEditado.setPerfil(perfil);
 
-        repository.persist(attUsuario);
+        usuarioRepository.persist(usuarioEditado);
 
-        return UsuarioResponseDTO.valueOf(attUsuario);
+        return UsuarioResponseDTO.valueOf(usuarioEditado);
     }
 
     @Override
     @Transactional
-    public void delete(Long id) {
-        repository.deleteById(id);
+    public void delete(long id) {
+        usuarioRepository.deleteById(id);
     }
 
     @Override
-    public UsuarioResponseDTO findById(Long id) {
-        return UsuarioResponseDTO.valueOf(repository.findById(id));
-    }
-    
-    @Override
-    public List<UsuarioResponseDTO> findByNome(String nome) {
-       return repository.findByNome(nome).stream()
-                .map(e -> UsuarioResponseDTO.valueOf(e)).toList();
+    public UsuarioResponseDTO updateNome(String email, String nome) {
+        Usuario usuarioNomeEditado = usuarioRepository.findByEmail(email);
+        usuarioNomeEditado.setNome(nome);
+        usuarioRepository.persist(usuarioNomeEditado);
+
+        return UsuarioResponseDTO.valueOf(usuarioNomeEditado);   
     }
 
     @Override
-    public List<UsuarioResponseDTO> findByAll() {
-        return repository.listAll().stream()
-                .map(e -> UsuarioResponseDTO.valueOf(e)).toList();
+    public UsuarioResponseDTO updateSenha(String email, String senha) {
+        Usuario usuarioSenhaEditada = usuarioRepository.findByEmail(email);
+        usuarioSenhaEditada.setSenha(senha);
+        usuarioRepository.persist(usuarioSenhaEditada);
+
+        return UsuarioResponseDTO.valueOf(usuarioSenhaEditada);  
     }
 
     @Override
-    public UsuarioResponseDTO findByEmailAndSenha(String email, String senha) {
-        Usuario usuario = repository.findByEmailAndSenha(email, senha);
-        if (usuario == null)
-            throw new ValidationException("email", "Email ou senha inválido");
-
-        return UsuarioResponseDTO.valueOf(usuario);
+    public UsuarioResponseDTO findById(long id) {
+        return UsuarioResponseDTO.valueOf(usuarioRepository.findById(id));
     }
 
     @Override
     public UsuarioResponseDTO findByEmail(String email) {
-        Usuario usuario = repository.findByEmail(email);
-        if (usuario == null)
-            throw new ValidationException("email", "Email inválido");
-
+        Usuario usuario = usuarioRepository.findByEmail(email);
         return UsuarioResponseDTO.valueOf(usuario);
     }
 
     @Override
-    @Transactional
-    public UsuarioResponseDTO updateSenha(String email, String senha) {
-        Usuario usuario = repository.findByEmail(email);
-        usuario.setSenha(senha);
-        repository.persist(usuario);
-        return UsuarioResponseDTO.valueOf(usuario);
+    public UsuarioResponseDTO findByEmailAndSenha(String email, String senha) {
+        Usuario usuario = usuarioRepository.findByEmailAndSenha(email, senha);
+        return UsuarioResponseDTO.valueOf(usuario);   
     }
 
     @Override
-    @Transactional
-    public UsuarioResponseDTO updateNome(String email, String nome) {
-        Usuario usuario = repository.findByEmail(email);
-        usuario.setNome(nome);
-        repository.persist(usuario);
+    public List<UsuarioResponseDTO> findAll(int page, int pageSize, String sort) {
+        String query = "";
+        Map<String, Object> params = new HashMap<>();
 
-        return UsuarioResponseDTO.valueOf(usuario);
+        if (sort != null && !sort.isEmpty()) {
+            switch (sort) {
+                case "nome":
+                    query = "order by nome";
+                    break;
+                case "nome desc":
+                    query = "order by nome desc";
+                    break;
+                default:
+                    query = "order by id";
+            }
+        } else {
+            query = "order by id";
+        }
+
+        PanacheQuery<Usuario> panacheQuery = usuarioRepository.find(query, params);
+
+        if (pageSize > 0) {
+            panacheQuery = panacheQuery.page(page, pageSize);
+        }
+
+        return panacheQuery.list()
+            .stream()
+            .map(usuario -> UsuarioResponseDTO.valueOf(usuario))
+            .collect(Collectors.toList());
     }
+
+    @Override
+    public List<UsuarioResponseDTO> findByNome(String nome, int page, int pageSize, String sort) {
+        String query = "UPPER(nome) LIKE UPPER(:nome)";
+        Map<String, Object> params = new HashMap<>();
+        params.put("nome", "%" + nome + "%");
+
+        if (sort != null && !sort.isEmpty()) {
+            switch (sort) {
+                case "nome":
+                    query += " order by nome";
+                    break;
+                case "nome desc":
+                    query += " order by nome desc";
+                    break;
+                default:
+                    query += " order by id";
+            }
+        } else {
+            query += " order by id";
+        }
+
+        PanacheQuery<Usuario> panacheQuery = usuarioRepository.find(query, params);
+
+        if (pageSize > 0) {
+            panacheQuery = panacheQuery.page(page, pageSize);
+        }
+
+        return panacheQuery.list()
+            .stream()
+            .map(usuario -> UsuarioResponseDTO.valueOf(usuario))
+            .collect(Collectors.toList());
+    }
+
+    public List<Usuario> findByNome(String nome) {
+        return usuarioRepository.findByNome(nome).list();
+    }
+
+    @Override
+    public long count() {
+        return usuarioRepository.findAll().count();
+    }
+
+    @Override
+    public long count(String nome) {
+        return usuarioRepository.countByNome(nome);
+    }
+
 }

@@ -1,141 +1,176 @@
 package com.studio19.service;
 
+import java.util.HashMap;
 import java.util.List;
-import org.jboss.logging.Logger;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import com.studio19.dto.ClienteDTO;
 import com.studio19.dto.ClienteResponseDTO;
 import com.studio19.dto.UsuarioResponseDTO;
 import com.studio19.model.Cliente;
+import com.studio19.model.Perfil;
 import com.studio19.model.Telefone;
 import com.studio19.repository.ClienteRepository;
-import com.studio19.repository.UsuarioRepository;
-import com.studio19.resource.ClienteResource;
-
+import io.quarkus.hibernate.orm.panache.PanacheQuery;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
-import jakarta.validation.Valid;
-import jakarta.ws.rs.NotFoundException;
-import jakarta.ws.rs.WebApplicationException;
 
 @ApplicationScoped
 public class ClienteServiceImpl implements ClienteService {
     @Inject
-    ClienteRepository repository;
-
-    @Inject
-    UsuarioRepository usuarioRepository;
-
-    @Inject
-    HashService hashService;
-
-    private static final Logger LOG = Logger.getLogger(ClienteResource.class);
+    ClienteRepository clienteRepository;
 
     @Override
     @Transactional
-    public ClienteResponseDTO insert(@Valid ClienteDTO dto) {
-        Cliente cliente = new Cliente();
+    public ClienteResponseDTO create(ClienteDTO cliente) {
+        Cliente novoCliente = new Cliente();
+        novoCliente.setNome(cliente.nome());
+        novoCliente.setEmail(cliente.email());
+        novoCliente.setSenha(cliente.senha());
+        novoCliente.setPerfil(Perfil.CLIENTE);
 
-        cliente.setNome(dto.nome());
-        cliente.setEmail(dto.email());
-        cliente.setSenha(dto.senha());
-
-        if (dto.telefone() != null) {
+        if (cliente.telefone() != null) {
             Telefone telefone = new Telefone();
-            telefone.setDdd(dto.telefone().ddd());
-            telefone.setNumero(dto.telefone().numero());
-            telefone.setCliente(cliente);
-            cliente.setTelefone(telefone);
+            telefone.setDdd(cliente.telefone().ddd());
+            telefone.setNumero(cliente.telefone().numero());
+            novoCliente.setTelefone(telefone);
         }
 
-        repository.persist(cliente);
-        return ClienteResponseDTO.valueOf(cliente);
+        clienteRepository.persist(novoCliente);
+
+        return ClienteResponseDTO.valueOf(novoCliente);
     }
 
     @Override
     @Transactional
-    public ClienteResponseDTO update(ClienteDTO dto, Long id) {
-        Cliente clienteAtt = repository.findById(id);
-        if (clienteAtt == null) {
-            throw new WebApplicationException("Cliente não encontrado", 404);
-        }
+    public ClienteResponseDTO update(ClienteDTO clienteDTO, Long id) {
+        Cliente clienteEditado = clienteRepository.findById(id);
 
-        clienteAtt.setNome(dto.nome());
-        clienteAtt.setEmail(dto.email());
-        clienteAtt.setSenha(dto.senha());
+        clienteEditado.setNome(clienteDTO.nome());
+        clienteEditado.setEmail(clienteDTO.email());
+        clienteEditado.setNome(clienteDTO.nome());
+        clienteEditado.setEmail(clienteDTO.email());
+        clienteEditado.setSenha(clienteDTO.senha());
+        clienteEditado.setPerfil(Perfil.CLIENTE);
 
-        if (dto.telefone() != null) {
-            Telefone telefone = clienteAtt.getTelefone();
+        if (clienteDTO.telefone() != null) {
+            Telefone telefone = clienteEditado.getTelefone();
 
             if (telefone == null) {
                 telefone = new Telefone();
-                telefone.setCliente(clienteAtt);
             }
-            telefone.setDdd(dto.telefone().ddd());
-            telefone.setNumero(dto.telefone().numero());
-            clienteAtt.setTelefone(telefone);
+            telefone.setDdd(clienteDTO.telefone().ddd());
+            telefone.setNumero(clienteDTO.telefone().numero());
+            clienteEditado.setTelefone(telefone);
         }
 
-        return ClienteResponseDTO.valueOf(clienteAtt);
+        return ClienteResponseDTO.valueOf(clienteEditado);
     }
 
     @Override
     @Transactional
-    public void delete(Long id) {
-        if (!repository.deleteById(id))
-            throw new NotFoundException();
+    public void delete(long id) {
+        clienteRepository.deleteById(id);
     }
 
     @Override
-    public ClienteResponseDTO findById(Long id) {
-        Cliente cliente = repository.findById(id);
-        if (cliente == null) {
-            throw new EntityNotFoundException("Cliente não encontrado com ID: " + id);
-        }
+    public ClienteResponseDTO findById(long id) {
+        Cliente cliente = clienteRepository.findById(id);
         return ClienteResponseDTO.valueOf(cliente);
     }
 
     @Override
-    public List<ClienteResponseDTO> findByNome(String nome) {
-        return repository.findByNome(nome).stream()
-                .map(e -> ClienteResponseDTO.valueOf(e)).toList();
+    public List<ClienteResponseDTO> findAll(int page, int pageSize, String sort) {
+        String query = "";
+        Map<String, Object> params = new HashMap<>();
+
+        if (sort != null && !sort.isEmpty()) {
+            switch (sort) {
+                case "nome":
+                    query = "order by nome";
+                    break;
+                case "nome desc":
+                    query = "order by nome desc";
+                    break;
+                default:
+                    query = "order by id";
+            }
+        } else {
+            query = "order by id";
+        }
+
+        PanacheQuery<Cliente> panacheQuery = clienteRepository.find(query, params);
+
+        if (pageSize > 0) {
+            panacheQuery = panacheQuery.page(page, pageSize);
+        }
+
+        return panacheQuery.list()
+            .stream()
+            .map(cliente -> ClienteResponseDTO.valueOf(cliente))
+            .collect(Collectors.toList());
     }
 
     @Override
-    public List<ClienteResponseDTO> findByAll() {
-        return repository.listAll().stream()
-                .map(e -> ClienteResponseDTO.valueOf(e)).toList();
+    public List<ClienteResponseDTO> findByNome(String nome, int page, int pageSize, String sort) {
+        String query = "UPPER(nome) LIKE UPPER(:nome)";
+        Map<String, Object> params = new HashMap<>();
+        params.put("nome", "%" + nome + "%");
+
+        if (sort != null && !sort.isEmpty()) {
+            switch (sort) {
+                case "nome":
+                    query += " order by nome";
+                    break;
+                case "nome desc":
+                    query += " order by nome desc";
+                    break;
+                default:
+                    query += " order by id";
+            }
+        } else {
+            query += " order by id";
+        }
+
+        PanacheQuery<Cliente> panacheQuery = clienteRepository.find(query, params);
+
+        if (pageSize > 0) {
+            panacheQuery = panacheQuery.page(page, pageSize);
+        }
+
+        return panacheQuery.list()
+            .stream()
+            .map(cliente -> ClienteResponseDTO.valueOf(cliente))
+            .collect(Collectors.toList());
     }
 
     @Override
+    public long count() {
+        return clienteRepository.findAll().count();
+    }
+
+    @Override
+    public long count(String nome) {
+        return clienteRepository.countByNome(nome);
+    }
+
     public UsuarioResponseDTO login(String email, String senha) {
-        // Log de entrada no método
-        LOG.info("Tentativa de login com email: " + email);
         
-        // Busca pelo cliente
-        Cliente cliente = repository.findByEmailAndSenha(email, senha);
-    
-        // Verifica se o cliente é nulo
+        Cliente cliente = clienteRepository.findByEmailAndSenha(email, senha);
+
         if (cliente == null) {
-            // Log de erro
-            LOG.info("Cliente não encontrado para o email: " + email + " e senha fornecida");
             throw new RuntimeException("Cliente não encontrado");
         }
-    
-        // Log de sucesso
-        LOG.info("Login bem-sucedido para o cliente com email: " + email);
     
         return UsuarioResponseDTO.valueOf(cliente);
     }
 
     @Override
     public ClienteResponseDTO findByEmail(String email) {
-        Cliente cliente = repository.findByEmail(email);
-        if (cliente == null) {
-            throw new EntityNotFoundException("Cliente não encontrado com email: " + email);
-        }
+        Cliente cliente = clienteRepository.findByEmail(email);
         return ClienteResponseDTO.valueOf(cliente);
     }
+
 }

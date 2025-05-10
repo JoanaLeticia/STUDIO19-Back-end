@@ -6,15 +6,15 @@ import com.studio19.dto.ClienteDTO;
 import com.studio19.dto.ClienteResponseDTO;
 import com.studio19.dto.UsuarioResponseDTO;
 
-import jakarta.validation.Valid;
-
 public interface ClienteService {
-    public ClienteResponseDTO insert(@Valid ClienteDTO dto);
-    public ClienteResponseDTO update(ClienteDTO dto, Long id);
-    public void delete(Long id);
-    public ClienteResponseDTO findById(Long id);
-    public List<ClienteResponseDTO> findByNome(String nome);
-    public List<ClienteResponseDTO> findByAll();
+    ClienteResponseDTO create(ClienteDTO cliente);
+    ClienteResponseDTO update(ClienteDTO clienteDTO, Long id);
+    void delete(long id);
+    ClienteResponseDTO findById(long id);
+    List<ClienteResponseDTO> findAll(int page, int pageSize, String sort);
+    List<ClienteResponseDTO> findByNome(String nome, int page, int pageSize, String sort);
+    long count();
+    long count(String nome);
     public UsuarioResponseDTO login(String email, String senha);
     public ClienteResponseDTO findByEmail(String email);
 }

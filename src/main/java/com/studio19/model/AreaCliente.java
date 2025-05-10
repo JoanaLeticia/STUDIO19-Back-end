@@ -6,8 +6,10 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 
 @Entity
+@Table(name = "area_cliente")
 public class AreaCliente extends DefaultEntity {
     @OneToOne
     @JoinColumn(name = "id_cliente")

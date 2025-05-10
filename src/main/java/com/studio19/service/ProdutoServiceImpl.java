@@ -7,6 +7,7 @@ import java.util.List;
 import com.studio19.dto.ProdutoDTO;
 import com.studio19.dto.ProdutoResponseDTO;
 import com.studio19.model.CategoriaProduto;
+import com.studio19.model.Imagem;
 import com.studio19.model.Produto;
 import com.studio19.repository.ProdutoRepository;
 
@@ -32,7 +33,14 @@ public class ProdutoServiceImpl implements ProdutoService {
         produto.setSubtitulo(dto.subtitulo());
         
         if (dto.imagens() != null && !dto.imagens().isEmpty()) {
-            produto.setImagens(dto.imagens());
+            List<Imagem> imagens = dto.imagens().stream()
+                .map(nome -> {
+                    Imagem img = new Imagem();
+                    img.setNomeImagem(nome);
+                    img.setProduto(produto);
+                    return img;
+                }).toList();
+            produto.setImagens(imagens);
         } else {
             produto.setImagens(Collections.emptyList());
         }
@@ -57,7 +65,14 @@ public class ProdutoServiceImpl implements ProdutoService {
         produtoAtt.setCategoria(CategoriaProduto.valueOf(dto.idCategoriaProduto()));
 
         if (dto.imagens() != null && !dto.imagens().isEmpty()) {
-            produtoAtt.setImagens(dto.imagens());
+            List<Imagem> imagens = dto.imagens().stream()
+                .map(nome -> {
+                    Imagem img = new Imagem();
+                    img.setNomeImagem(nome);
+                    img.setProduto(produtoAtt);
+                    return img;
+                }).toList();
+            produtoAtt.setImagens(imagens);
         } else {
             produtoAtt.setImagens(Collections.emptyList());
         }
@@ -101,14 +116,18 @@ public class ProdutoServiceImpl implements ProdutoService {
             throw new NotFoundException("Produto não encontrado com o id: " + id);
         }
 
-        List<String> imagens = produto.getImagens();
+        List<Imagem> imagens = produto.getImagens();
         if (imagens == null) {
             imagens = new ArrayList<>();
+            produto.setImagens(imagens); // inicializa na entidade
         }
-        imagens.add(nomeImagem);
-        produto.setImagens(imagens);
+
+        Imagem novaImagem = new Imagem();
+        novaImagem.setNomeImagem(nomeImagem);
+        novaImagem.setProduto(produto);
+
+        imagens.add(novaImagem);
 
         return ProdutoResponseDTO.valueOf(produto);
     }
-
 }

@@ -4,34 +4,31 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
 public enum Perfil {
-
-    ADMIN(1, "Admin"),
+    ADMIN(1, "Administrador"), 
     CLIENTE(2, "Cliente");
 
-    private final Integer id;
-    private final String label;
+    private final int ID;
+    private final String NOME;
 
-    Perfil(Integer id, String label) {
-        this.id = id;
-        this.label = label;
+    Perfil(int id, String nome) {
+        this.ID = id;
+        this.NOME = nome;
     }
 
-    public Integer getId() {
-        return id;
+    public int getId() {
+        return ID;
     }
 
-    public String getLabel() {
-        return label;
+    public String getNome() {
+        return NOME;
     }
 
-    public static Perfil valueOf(Integer id) throws IllegalArgumentException {
-        if (id == null)
-            return null;
-        for (Perfil perfil : Perfil.values()) {
-            if (perfil.getId().equals(id))
-                return perfil;
+     public static Perfil valueOf(int id) {
+        for (Perfil p : Perfil.values()) {
+            if (p.getId() == id)
+                return p;
         }
-        throw new IllegalArgumentException("Id inválido" + id);
-    }
-
+        return null;
+     }
 }
+

@@ -5,7 +5,7 @@ import com.studio19.model.Cliente;
 public record ClienteResponseDTO(
         Long id,
         String nome,
-        String email,
+        String login,
         TelefoneResponseDTO telefone) {
     public static ClienteResponseDTO valueOf(Cliente cliente) {
         if (cliente == null) {

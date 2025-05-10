@@ -16,13 +16,19 @@ import jakarta.persistence.ManyToOne;
 
 @Entity
 public class Projeto extends DefaultEntity {
+    @Column(name = "nome_projeto")
     private String nomeProjeto;
 
     @Enumerated(EnumType.STRING)
     private CategoriaProjeto categoria;
 
+    @Column(name = "data_desenvolvimento")
     private LocalDate dataDesenvolvimento;
+
+    @Column(name = "nome_cliente")
     private String nomeCliente;
+
+    @Column(name = "descricao_projeto")
     private String descricaoProjeto;
 
     @ManyToOne
@@ -38,6 +44,7 @@ public class Projeto extends DefaultEntity {
     @Column(name = "url_imagem")
     private List<String> imagens;
 
+    @Column(name = "link_externo")
     private String linkExterno;
 
     public String getNomeProjeto() {

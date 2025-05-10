@@ -1,15 +1,16 @@
 package com.studio19.model;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
-import jakarta.persistence.CollectionTable;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
-import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.JoinColumn;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.OneToMany;
 
 @Entity
 public class Produto extends DefaultEntity {
@@ -24,10 +25,8 @@ public class Produto extends DefaultEntity {
 
     private BigDecimal preco;
 
-    @ElementCollection
-    @CollectionTable(name = "portfolio_imagens", joinColumns = @JoinColumn(name = "projeto_id"))
-    @Column(name = "url_imagem")
-    private List<String> imagens;
+    @OneToMany(mappedBy = "produto", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<Imagem> imagens = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
     private CategoriaProduto categoria;
@@ -72,11 +71,11 @@ public class Produto extends DefaultEntity {
         this.subtitulo = subtitulo;
     }
 
-    public List<String> getImagens() {
+    public List<Imagem> getImagens() {
         return imagens;
     }
 
-    public void setImagens(List<String> imagens) {
+    public void setImagens(List<Imagem> imagens) {
         this.imagens = imagens;
     }
 

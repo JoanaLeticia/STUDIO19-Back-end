@@ -2,7 +2,7 @@ package com.studio19.resource;
 
 import com.studio19.dto.AuthUsuarioDTO;
 import com.studio19.dto.UsuarioResponseDTO;
-import com.studio19.service.AdminService;
+import com.studio19.service.AdministradorService;
 import com.studio19.service.ClienteService;
 import com.studio19.service.HashService;
 import com.studio19.service.JwtService;
@@ -21,7 +21,7 @@ import jakarta.ws.rs.core.Response.Status;
 @Consumes(MediaType.APPLICATION_JSON)
 public class AuthResource {
     @Inject
-    public AdminService adminService;
+    public AdministradorService adminService;
 
     @Inject
     public ClienteService clienteService;

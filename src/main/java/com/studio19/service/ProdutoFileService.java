@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
+import com.studio19.model.Imagem;
 import com.studio19.model.Produto;
 import com.studio19.repository.ProdutoRepository;
 
@@ -33,13 +34,16 @@ public class ProdutoFileService implements FileService {
             String nomeArquivo = salvarImagem(nomeImagem, imagem);
 
             // Se lista de imagens estiver vazia, inicializa
-            List<String> imagens = produto.getImagens();
+            List<Imagem> imagens = produto.getImagens();
             if (imagens == null) {
                 imagens = new ArrayList<>();
+                produto.setImagens(imagens);
             }
 
-            imagens.add(nomeArquivo);
-            produto.setImagens(imagens);
+            Imagem novaImagem = new Imagem();
+            novaImagem.setNomeImagem(nomeArquivo);
+            novaImagem.setProduto(produto);
+            imagens.add(novaImagem);
         } catch (IOException e) {
             throw new ValidationException("imagem", e.getMessage());
         }

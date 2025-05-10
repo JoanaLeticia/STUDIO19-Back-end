@@ -1,12 +1,15 @@
 package com.studio19.resource;
 
-import org.eclipse.microprofile.jwt.JsonWebToken;
-import org.jboss.logging.Logger;
+import java.util.List;
 
+import org.eclipse.microprofile.jwt.JsonWebToken;
 import com.studio19.repository.ClienteRepository;
 import com.studio19.repository.UsuarioRepository;
 import com.studio19.service.ClienteService;
 import com.studio19.service.PedidoService;
+import com.studio19.dto.PedidoResponseDTO;
+import com.studio19.dto.ItemPedidoResponseDTO;
+import com.studio19.model.Cliente;
 import com.studio19.service.UsuarioService;
 
 import jakarta.annotation.security.RolesAllowed;
@@ -32,6 +35,9 @@ public class UsuarioLogadoResource {
     UsuarioRepository repository;
 
     @Inject
+    UsuarioService usuarioService;
+
+    @Inject
     PedidoService pedidoService;
 
     @Inject
@@ -40,20 +46,14 @@ public class UsuarioLogadoResource {
     @Inject
     ClienteRepository clienteRepository;
 
-    @Inject
-    UsuarioService usuarioService;
-
-    private static final Logger LOG = Logger.getLogger(UsuarioLogadoResource.class);
 
     @GET
     @RolesAllowed({ "Cliente", "Admin" })
     public Response getUsuario() {
-        // obtendo o email pelo token jwt
-        String email = jwt.getSubject();
+        // obtendo o login pelo token jwt
+        String login = jwt.getSubject();
         try {
-            LOG.info("obtendo o email pelo token jwt");
-            LOG.info("Retornando email");
-            return Response.ok(usuarioService.findByEmail(email)).build();
+            return Response.ok(usuarioService.findByEmail(login)).build();
         } catch (Exception e) {
             return Response.status(Response.Status.BAD_REQUEST)
                     .entity("Erro ao retornar informações do usuário logado: " + e.getMessage())
@@ -64,13 +64,12 @@ public class UsuarioLogadoResource {
 
     @PATCH
     @Transactional
-    @Path("/updateSenha/{senha}")
+    @Path("/updateNome/{nome}")
     @RolesAllowed({ "Cliente", "Admin" })
-    public Response updateSenha(@PathParam("senha") String senha) {
-        String email = jwt.getSubject();
+    public Response updateNome(@PathParam("nome") String nome) {
+        String login = jwt.getSubject();
         try {
-            usuarioService.updateSenha(email, senha);
-            LOG.info("Senha atualizada!");
+            usuarioService.updateNome(login, nome);
             return Response.ok("Informações do usuário atualizadas com sucesso").build();
         } catch (Exception e) {
             return Response.status(Response.Status.BAD_REQUEST)
@@ -81,18 +80,47 @@ public class UsuarioLogadoResource {
 
     @PATCH
     @Transactional
-    @Path("/updateNome/{nome}")
+    @Path("/updateSenha/{senha}")
     @RolesAllowed({ "Cliente", "Admin" })
-    public Response updateNome(@PathParam("nome") String nome) {
-        String email = jwt.getSubject();
+    public Response updateSenha(@PathParam("senha") String senha) {
+        String login = jwt.getSubject();
         try {
-            usuarioService.updateNome(email, nome);
-            LOG.info("Nome atualizado!");
+            usuarioService.updateSenha(login, senha);
             return Response.ok("Informações do usuário atualizadas com sucesso").build();
         } catch (Exception e) {
             return Response.status(Response.Status.BAD_REQUEST)
                     .entity("Erro ao atualizar informações do usuário: " + e.getMessage())
                     .build();
+        }
+    }
+
+    @GET
+    @RolesAllowed({ "Cliente", "Admin" })
+    @Path("/PedidosDoUsuario")
+    public Response getPedidosUsuario() {
+        String login = jwt.getSubject();
+        Cliente usuarioLogado = clienteRepository.findByEmail(login);
+
+        if (usuarioLogado != null) {
+            List<PedidoResponseDTO> pedidos = pedidoService.pedidosUsuarioLogado(usuarioLogado);
+            return Response.ok(pedidos).build();
+        } else {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+    }
+
+    @GET
+    @RolesAllowed({ "Cliente", "Admin" })
+    @Path("/ItensDasComprasUsuario")
+    public Response getItensPedidosUsuario() {
+        String login = jwt.getSubject();
+        Cliente usuarioLogado = clienteRepository.findByEmail(login);
+
+        if (usuarioLogado != null) {
+            List<ItemPedidoResponseDTO> itens = pedidoService.findItensByUsuario(usuarioLogado);
+            return Response.ok(itens).build();
+        } else {
+            return Response.status(Response.Status.NOT_FOUND).build();
         }
     }
 }

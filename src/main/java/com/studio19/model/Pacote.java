@@ -7,6 +7,7 @@ import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 
@@ -16,7 +17,7 @@ public class Pacote extends DefaultEntity {
     private String descricao;
     private BigDecimal valor;
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "pacote_itens", joinColumns = @JoinColumn(name = "pacote_id"))
     @Column(name = "item_incluso")
     private List<String> itensInclusos;

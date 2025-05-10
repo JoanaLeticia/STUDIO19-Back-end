@@ -13,6 +13,13 @@ public record PacoteResponseDTO (
     List<String> itensIncluidos
 ) {
     public static PacoteResponseDTO valueOf(Pacote pacote) {
+
+        if (pacote == null) {
+            return null;
+        }
+
+        pacote.getItensInclusos().size();
+        
         return new PacoteResponseDTO(
             pacote.getId(),
             pacote.getNome(),

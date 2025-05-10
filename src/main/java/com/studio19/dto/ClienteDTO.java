@@ -2,17 +2,15 @@ package com.studio19.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 
 public record ClienteDTO (
-    @NotBlank(message = "Digite o seu nome.")
+    @NotBlank(message = "O campo nome não pode ser nulo.")
     String nome,
-    @NotBlank(message = "Digite o seu e-mail.")
-    @Email(message = "O e-mail fornecido não está formatado corretamente!")
+    @NotBlank(message = "O campo email não pode ser nulo.")
+    @Email(message = "O campo email não esta no formato correto!")
     String email,
-    @NotBlank(message = "Digite a senha.")
+    @NotBlank(message = "O campo senha não pode ser nulo.")
     String senha,
-    @NotNull(message = "O id do Telefone não pode ser nulo.")
     TelefoneDTO telefone
 ) {
     
